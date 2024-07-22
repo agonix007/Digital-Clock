@@ -129,7 +129,7 @@ void drawSmallDigit(int device, int col, int digit)
   for (int i = 0; i < 3; i++)
   {
     byte columnData = pgm_read_byte(&digits[digit][i]);
-    columnData = columnData << 2; // Shift up by 2 to center vertically
+    columnData = columnData << 2;
     lc.setColumn(device, col + i, columnData);
   }
 }
@@ -139,7 +139,7 @@ void drawSmallColon(int device, int col)
   for (int i = 0; i < 3; i++)
   {
     byte columnData = pgm_read_byte(&colon[i]);
-    columnData = columnData << 2; // Shift up by 2 to center vertically
+    columnData = columnData << 2;
     lc.setColumn(device, col + i, columnData);
   }
 }
@@ -158,12 +158,12 @@ void drawChar(int device, int col, char c)
   else if (c == ':')
     index = 38;
   else
-    return; // Invalid character
+    return;
 
   for (int i = 0; i < 3; i++)
   {
     byte columnData = pgm_read_byte(&font[index][i]);
-    columnData = columnData << 2; // Shift up by 2 to center vertically
+    columnData = columnData << 2;
     lc.setColumn(device, col + i, columnData);
   }
 }
@@ -182,46 +182,41 @@ void displayTime(DateTime now)
   int minutes = now.minute();
   int seconds = now.second();
 
-  // Draw hours
   drawSmallDigit(3, 0, hours / 10);
   drawSmallDigit(3, 4, hours % 10);
-  // Draw first colon
+
   drawSmallColon(2, 0);
-  // Draw minutes
+
   drawSmallDigit(2, 4, minutes / 10);
   drawSmallDigit(1, 1, minutes % 10);
-  // Draw second colon
+
   drawSmallColon(1, 5);
-  // Draw seconds
+
   drawSmallDigit(0, 1, seconds / 10);
   drawSmallDigit(0, 5, seconds % 10);
 }
 
 void displayDateAndDay(DateTime now)
 {
-  char dateBuffer[6]; // "DDMMM"
+  char dateBuffer[6];
   sprintf(dateBuffer, "%02d%s", now.day(), MONTHS[now.month() - 1]);
 
   const char *day = DAYS[now.dayOfTheWeek()];
 
-  // Calculate total width
-  int dateWidth = 5 * 4; // 5 characters for date, 4 pixels each
-  int dayWidth = 3 * 4;  // 3 characters for day, 4 pixels each (increased from 3)
+  int dateWidth = 5 * 4;
+  int dayWidth = 3 * 4;
 
-  // Calculate left padding to center the entire string
   int leftPad = (32 - (dateWidth + dayWidth)) / 2;
 
-  // Display date
   for (int i = 0; i < 5; i++)
   {
     int position = leftPad + i * 4;
     drawChar(3 - position / 8, position % 8, dateBuffer[i]);
   }
 
-  // Display day (using regular font)
   for (int i = 0; i < 3; i++)
   {
-    int position = leftPad + dateWidth + 1 + i * 4; // Increased spacing to 4
+    int position = leftPad + dateWidth + 1 + i * 4;
     drawChar(3 - position / 8, position % 8, day[i]);
   }
 }
